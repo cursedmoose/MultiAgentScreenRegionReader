@@ -1,2 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+using CursedMoose.MASR.Hotkeys;
+
+HotKeyManager.Initialize();
+Console.WriteLine("Hotkey listener activated!");
+
+while (true)
+{
+    var next = Console.ReadLine();
+}
