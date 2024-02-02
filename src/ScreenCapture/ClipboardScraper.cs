@@ -92,13 +92,9 @@ namespace CursedMoose.MASR.ScreenCapture
         {
             if (HasNewImage())
             {
-                var filePath = "images/screenshots/clipboard.png";
                 var image = GetImage();
-                using (var fs = new FileStream(filePath, FileMode.Create))
-                {
-                    image.Save(fs, System.Drawing.Imaging.ImageFormat.Png);
-                }
-                await ElevenLabs.ElevenLabs.Narrator.ReadImage(ImagePath);
+                var bmp = new Bitmap(image);
+                await ElevenLabs.ElevenLabs.Narrator.ReadImage(bmp);
             }
             await Task.Delay(1_000);
         }

@@ -39,7 +39,7 @@ namespace CursedMoose.MASR.ScreenCapture
             return bmp;
         }
 
-        private Bitmap CaptureScreenRegion()
+        public Bitmap CaptureScreenRegion()
         {
             Bitmap bmp = new(selectedRegion.Width, selectedRegion.Height);
             using (Graphics g = Graphics.FromImage(bmp))
@@ -89,6 +89,12 @@ namespace CursedMoose.MASR.ScreenCapture
 
         public void SelectScreenRegion()
         {
+            if (ScreenRegionSelector.isSelectingScreenRegion)
+            {
+                log.Info("Form is already open...");
+                return;
+            }
+
             Task mytask = Task.Run(() =>
             {
                 selectorForm = new ScreenRegionSelector(CaptureScreen());

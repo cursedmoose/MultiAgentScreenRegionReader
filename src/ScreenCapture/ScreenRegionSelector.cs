@@ -13,6 +13,7 @@ namespace CursedMoose.MASR.ScreenCapture
         private Brush selectBrush;
         private Image screen;
 
+        public static bool isSelectingScreenRegion { get; private set; } = false;
         bool hasStartedDrawing = false;
         public ScreenRegionSelector(Image screen)
         {
@@ -41,6 +42,7 @@ namespace CursedMoose.MASR.ScreenCapture
 
         private void ScreenRegionSelector_Load(object sender, EventArgs e)
         {
+            isSelectingScreenRegion = true;
             using (MemoryStream s = new MemoryStream())
             {
                 screen.Save(s, ImageFormat.Bmp);
@@ -99,6 +101,7 @@ namespace CursedMoose.MASR.ScreenCapture
                 Rectangle rect = new Rectangle(mouseSelectX, mouseSelectY, selectWidth, selectHeight);
                 ScreenCapturer.Instance.SetScreenRegion(rect);
             }
+            isSelectingScreenRegion = false;
             this.Hide();
         }
     }

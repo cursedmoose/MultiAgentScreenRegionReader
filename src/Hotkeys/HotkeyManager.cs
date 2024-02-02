@@ -93,8 +93,8 @@ namespace CursedMoose.MASR.Hotkeys
                     if (ScreenCapturer.Instance.SelectedRegionArea > 9)
                     {
                         Console.WriteLine("Reading selected screen region...");
-                        ScreenCapturer.Instance.TakeScreenRegion();
-                        await ElevenLabs.ElevenLabs.Narrator.ReadImage();
+                        var bmp = ScreenCapturer.Instance.CaptureScreenRegion();
+                        await ElevenLabs.ElevenLabs.Narrator.ReadImage(bmp);
                     }
                     else
                     {

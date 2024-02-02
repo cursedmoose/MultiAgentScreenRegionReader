@@ -39,6 +39,15 @@ namespace CursedMoose.MASR.ElevenLabs
         {
             var configText = File.ReadAllText("config/elevenlabs.config.json");
             var config = JsonSerializer.Deserialize<ElevenLabsConfig>(configText, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+
+            if (config == null)
+            {
+                Console.WriteLine("No config file for elevenlabs was found. Creating a new one. Please be more careful with it.");
+            }
+            if (string.IsNullOrEmpty(config.api_key)) {
+                Console.WriteLine("Please set an api_key in elevenlabs.config.json");
+            }
+
             return config;
         }
 
@@ -91,7 +100,10 @@ namespace CursedMoose.MASR.ElevenLabs
 
         public void StreamTts(string tts)
         {
-            Task.Run(() => RunTtsStreamTask(tts));
+            if (!string.IsNullOrEmpty(tts))
+            {
+                Task.Run(() => RunTtsStreamTask(tts));
+            }
         }
 
         public async Task ReadImage(string filePath = "images/region.png")
@@ -101,6 +113,22 @@ namespace CursedMoose.MASR.ElevenLabs
             stopwatch.Stop();
             log.Info($"Model time: {stopwatch.ElapsedMilliseconds}ms");
             StreamTts(text);
+        }
+
+        public async Task ReadImage(Bitmap bmp)
+        {
+            try
+            {
+                var stopwatch = Stopwatch.StartNew();
+                var text = await ImageTextReader.Instance.ReadText(bmp);
+                stopwatch.Stop();
+                log.Info($"Model time: {stopwatch.ElapsedMilliseconds}ms");
+                StreamTts(text);
+            }
+            catch (Exception ex)
+            {
+                log.Error($"Could not do TTS because of {ex.Source}: {ex.Message}");
+            }
         }
     }
 }
