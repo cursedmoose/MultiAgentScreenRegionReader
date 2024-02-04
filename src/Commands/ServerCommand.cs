@@ -7,7 +7,7 @@ namespace CursedMoose.MASR.Commands
         public string Command { get; }
         public List<string> Aliases { get; }
 
-        protected Logger Log = new("Server");
+        protected static Logger Log = new("Server");
 
         protected const StringComparison CompareBy = StringComparison.OrdinalIgnoreCase;
 
@@ -53,7 +53,7 @@ namespace CursedMoose.MASR.Commands
                 }
                 else
                 {
-                    Console.WriteLine($"[ServerCommand] [ERROR] Command {command.Command} is already present in {KnownCommands[command.Command]}. Cannot add from {command.GetType()}");
+                    Log.Error($"Command {command.Command} is already present in {KnownCommands[command.Command]}. Cannot add from {command.GetType()}");
                 }
 
                 foreach (var alias in command.Aliases)
@@ -64,12 +64,12 @@ namespace CursedMoose.MASR.Commands
                     }
                     else
                     {
-                        Console.WriteLine($"[ServerCommand] [ERROR] Alias {alias} is already present in {KnownCommands[alias]}. Cannot add from {command.GetType()}");
+                        Log.Error($"Alias {alias} is already present in {KnownCommands[alias]}. Cannot add from {command.GetType()}");
                     }
                 }
                 
             }
-            Console.WriteLine("[ServerCommand] Validation complete. Errors are above.");
+            Log.Info("Validation complete. Errors (if any) are above.");
         }
     }
 }

@@ -1,10 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CursedMoose.MASR.Commands;
 using CursedMoose.MASR.Hotkeys;
+using CursedMoose.MASR.Logging;
 using MultiAgentScreenRegionReader.Commands;
 
+Logger log = new Logger("Server");
+
 HotKeyManager.Initialize();
-Console.WriteLine("Hotkey listener activated!");
 
 List<ServerCommand> handlers = new()
 {
@@ -28,11 +30,11 @@ while (true)
     {
         if (ex is InvalidOperationException)
         {
-           Console.WriteLine($"Command \"{next}\" not found.");
+           log.Error($"Command \"{next}\" not found.");
         }
         else
         {
-            Console.WriteLine("Error processing command.");
+            log.Error("Error processing command.");
         }
     }
     finally

@@ -70,6 +70,10 @@ namespace CursedMoose.MASR.ElevenLabs
                 log.Error("No text found in selection.");
                 return;
             }
+            else
+            {
+                log.Info($"[{voice.voice_name}]: {tts_arguments}");
+            }
 
             var all_arguments = string.Join(" ", program_arguments, tts_arguments);
 
@@ -121,7 +125,7 @@ namespace CursedMoose.MASR.ElevenLabs
             var stopwatch = Stopwatch.StartNew();
             var text = await ImageTextReader.Instance.ReadText(filePath);
             stopwatch.Stop();
-            log.Info($"Model time: {stopwatch.ElapsedMilliseconds}ms");
+            log.Debug($"Model time: {stopwatch.ElapsedMilliseconds}ms");
             StreamTts(text);
         }
 
@@ -132,7 +136,7 @@ namespace CursedMoose.MASR.ElevenLabs
                 var stopwatch = Stopwatch.StartNew();
                 var text = await ImageTextReader.Instance.ReadText(bmp);
                 stopwatch.Stop();
-                log.Info($"Model time: {stopwatch.ElapsedMilliseconds}ms");
+                log.Debug($"Model time: {stopwatch.ElapsedMilliseconds}ms");
                 StreamTts(text);
             }
             catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using CursedMoose.MASR.Logging;
 using CursedMoose.MASR.ScreenCapture;
 
 namespace CursedMoose.MASR.Hotkeys
@@ -8,12 +9,14 @@ namespace CursedMoose.MASR.Hotkeys
         public static event EventHandler<HotKeyEventArgs> HotKeyPressed;
 
         private static readonly Dictionary<HotkeyCommand, RegisteredHotkey> RegisteredHotkeys = new();
+
+        private static Logger log = new Logger("HotkeyManager");
         public static Hotkey CaptureNewHotKey()
         {
             var newKey = Console.ReadKey();
-            Console.WriteLine($"Pressed: {newKey.Key}+{newKey.Modifiers}");
+            log.Debug($"Pressed: {newKey.Key}+{newKey.Modifiers}");
             var convertedHotkey = new Hotkey((Keys)newKey.Key, newKey.Modifiers.toKeyModifiers());
-            Console.WriteLine($"Converted: {convertedHotkey.Keys}+{convertedHotkey.Modifiers}");
+            log.Debug($"Converted: {convertedHotkey.Keys}+{convertedHotkey.Modifiers}");
 
             return convertedHotkey;
         }
@@ -73,32 +76,34 @@ namespace CursedMoose.MASR.Hotkeys
             RegisterHotKey(HotkeyCommand.SelectScreenRegion, new(Keys.Space, KeyModifiers.Control | KeyModifiers.Alt));
             RegisterHotKey(HotkeyCommand.CaptureScreenRegion, new(Keys.Space, KeyModifiers.Alt));
             HotKeyPressed += new EventHandler<HotKeyEventArgs>(HotKeyManager_HotKeyPressed);
+            log.Info("Initilization complete. HotkeyManager running.");
+
         }
         private static async void HotKeyManager_HotKeyPressed(object? sender, HotKeyEventArgs e)
         {
             Hotkey hotkeyPressed = new(Keys: e.Key, Modifiers: e.Modifiers);
-            Console.WriteLine($"Keys Pressed: {hotkeyPressed.Modifiers}+{hotkeyPressed.Keys}");
+            log.Debug($"Keys Pressed: {hotkeyPressed.Modifiers}+{hotkeyPressed.Keys}");
             var selectedCommand = RegisteredHotkeys.FirstOrDefault((hotkey) => hotkey.Value.Hotkey == hotkeyPressed).Key;
-            Console.WriteLine($"Selected Command: {selectedCommand}");
+            log.Info($"Executing Command: {selectedCommand}");
 
             switch (selectedCommand)
             {
                 case HotkeyCommand.None:
                     break;
                 case HotkeyCommand.SelectScreenRegion:
-                    Console.WriteLine("Selecting screen region...");
+                    log.Info("Selecting screen region...");
                     ScreenCapturer.Instance.SelectScreenRegion();
                     break;
                 case HotkeyCommand.CaptureScreenRegion:
                     if (ScreenCapturer.Instance.SelectedRegionArea > 9)
                     {
-                        Console.WriteLine("Reading selected screen region...");
+                        log.Info("Reading selected screen region...");
                         var bmp = ScreenCapturer.Instance.CaptureScreenRegion();
                         await ElevenLabs.ElevenLabs.Narrator.ReadImage(bmp);
                     }
                     else
                     {
-                        Console.WriteLine("[HotkeyManager] Warning: Screen Area too small to take a picture. Please select one first.");
+                        log.Error("Warning: Screen Area too small to take a picture. Please select one first.");
                     }
                     break;
             }

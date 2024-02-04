@@ -1,10 +1,12 @@
-﻿using Tesseract;
+﻿using CursedMoose.MASR.Logging;
+using Tesseract;
 
 namespace CursedMoose.MASR.OCR
 {
     public class TesseractImageReader : ImageTextReader
     {
         TesseractEngine tesseract;
+        Logger log = new Logger("Tesseract");
 
         public TesseractImageReader()
         {
@@ -14,7 +16,7 @@ namespace CursedMoose.MASR.OCR
         {
             return await Task.Run(() =>
             {
-                Console.WriteLine($"Reading text from Image...");
+                log.Debug($"Reading text from Image...");
                 using (var page = tesseract.Process(image))
                 {
                     return page.GetText();
@@ -32,7 +34,7 @@ namespace CursedMoose.MASR.OCR
                     var bitmap = new Bitmap(fs);
                     using (var page = tesseract.Process(bitmap))
                     {
-                        Console.WriteLine($"Reading text from {filePath}...");
+                        log.Debug($"Reading text from {filePath}...");
                         return page.GetText();
                     }
                 }
