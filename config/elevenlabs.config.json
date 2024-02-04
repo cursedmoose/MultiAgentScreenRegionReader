@@ -1,11 +1,19 @@
 {
   "api_key": "",
-  "model": "eleven_turbo_v2",
   "remove_start_pattern": true,
   "start_pattern": "^(\\w)+\\:",
   "narrator_settings": {
     "voice_name": "Adam",
     "voice_id": "pNInz6obpgDQGcFmaJgB",
+    "model": "eleven_turbo_v2",
+    "stability": 0.5,
+    "similarity": 0.75,
+    "style": 0
+  },
+  "clippy_settings": {
+    "voice_name": "Rachel",
+    "voice_id": "21m00Tcm4TlvDq8ikWAM",
+    "model": "eleven_turbo_v2",
     "stability": 0.5,
     "similarity": 0.75,
     "style": 0

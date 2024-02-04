@@ -94,7 +94,7 @@ namespace CursedMoose.MASR.ScreenCapture
             {
                 var image = GetImage();
                 var bmp = new Bitmap(image);
-                await ElevenLabs.ElevenLabs.Narrator.ReadImage(bmp);
+                await ElevenLabs.ElevenLabs.Clippy.ReadImage(bmp);
             }
             await Task.Delay(1_000);
         }

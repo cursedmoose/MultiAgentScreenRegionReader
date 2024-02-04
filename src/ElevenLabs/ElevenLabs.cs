@@ -8,15 +8,16 @@ namespace CursedMoose.MASR.ElevenLabs
 {
     public record ElevenLabsConfig(
         string api_key,
-        string model,
         bool remove_start_pattern,
         string start_pattern,
-        VoiceSettings narrator_settings
-        );
+        VoiceSettings narrator_settings,
+        VoiceSettings clippy_settings
+    );
 
     public record VoiceSettings(
         string voice_name,
         string voice_id,
+        string model,
         float stability,
         float similarity,
         float style
@@ -27,12 +28,15 @@ namespace CursedMoose.MASR.ElevenLabs
         public static readonly object TtsLock = new();
 
         readonly Logger log = new("ElevenLabs");
-        readonly ElevenLabsConfig Config;
-        public static readonly ElevenLabs Narrator = new(ReadConfigFile());
+        public static readonly ElevenLabsConfig Config = ReadConfigFile();
+        public static readonly ElevenLabs Narrator = new(Config.narrator_settings);
+        public static readonly ElevenLabs Clippy = new(Config.clippy_settings);
 
-        public ElevenLabs(ElevenLabsConfig config)
+        private VoiceSettings voice;
+
+        public ElevenLabs(VoiceSettings voiceConfig)
         {
-            Config = config;
+            this.voice = voiceConfig;
         }
 
         public static ElevenLabsConfig ReadConfigFile()
@@ -40,12 +44,18 @@ namespace CursedMoose.MASR.ElevenLabs
             var configText = File.ReadAllText("config/elevenlabs.config.json");
             var config = JsonSerializer.Deserialize<ElevenLabsConfig>(configText, new JsonSerializerOptions(JsonSerializerDefaults.Web));
 
-            if (config == null)
+            if (config is not null)
+            {
+                if (string.IsNullOrEmpty(config.api_key))
+                {
+                    Console.WriteLine("Please set an api_key in elevenlabs.config.json");
+                }
+                return config;
+            }
+            else
             {
                 Console.WriteLine("No config file for elevenlabs was found. Creating a new one. Please be more careful with it.");
-            }
-            if (string.IsNullOrEmpty(config.api_key)) {
-                Console.WriteLine("Please set an api_key in elevenlabs.config.json");
+                Environment.Exit(1);
             }
 
             return config;
@@ -53,7 +63,7 @@ namespace CursedMoose.MASR.ElevenLabs
 
         private void RunTtsStreamTask(string tts)
         {
-            var program_arguments = string.Join(" ", "/C python lib/labs.py", Config.api_key, Config.narrator_settings.voice_id, Config.model);
+            var program_arguments = string.Join(" ", "/C python lib/labs.py", Config.api_key, voice.voice_id, voice.model);
             var tts_arguments = BuildStreamArgs(tts);
 
             if (tts_arguments.Trim().Length <= 0 ) {
