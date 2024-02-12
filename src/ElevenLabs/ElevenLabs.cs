@@ -10,8 +10,8 @@ namespace CursedMoose.MASR.ElevenLabs
         string api_key,
         bool remove_start_pattern,
         string start_pattern,
-        VoiceSettings narrator_settings,
-        VoiceSettings clippy_settings
+        string narrator,
+        string clippy
     );
 
     public record VoiceSettings(
@@ -26,17 +26,34 @@ namespace CursedMoose.MASR.ElevenLabs
     public class ElevenLabs
     {
         public static readonly object TtsLock = new();
+        private static readonly string VoiceConfigFolder = "config/voices/{0}.voice.json";
 
-        readonly Logger log = new("ElevenLabs");
+        readonly static Logger log = new("ElevenLabs");
         public static readonly ElevenLabsConfig Config = ReadConfigFile();
-        public static readonly ElevenLabs Narrator = new(Config.narrator_settings);
-        public static readonly ElevenLabs Clippy = new(Config.clippy_settings);
+        public static readonly Regex GlobalStartPattern = new(Config.start_pattern);
+        public static readonly Regex MultipleWhitespaceRegex = new(@"\s{2,}");
+
+        public static readonly Dictionary<string, ElevenLabs> Voices = new();
+        public static readonly ElevenLabs Narrator = new(Config.narrator);
+        public static readonly ElevenLabs Clippy = new(Config.clippy);
 
         private VoiceSettings voice;
 
         public ElevenLabs(VoiceSettings voiceConfig)
         {
             this.voice = voiceConfig;
+
+            if (!Voices.ContainsKey(voice.voice_name))
+            {
+                Voices.Add(voiceConfig.voice_name, this);
+            }
+        }
+
+        public ElevenLabs(string voiceName) : this(voiceConfig: GetVoiceFromConfig(voiceName))
+        {
+            // Voices.Add(voice.voice_name, this);
+            //this.voice = GetVoiceFromConfig(voiceConfigFile);
+            //:this(voice);
         }
 
         public static ElevenLabsConfig ReadConfigFile()
@@ -59,6 +76,29 @@ namespace CursedMoose.MASR.ElevenLabs
             }
 
             return config;
+        }
+
+        public static VoiceSettings GetVoiceFromConfig(string voiceName)
+        {
+            var configFile = string.Format(VoiceConfigFolder, voiceName);
+            log.Info($"Loading voice settings from {configFile}");
+            var configText = File.ReadAllText(string.Format(VoiceConfigFolder, voiceName));
+            var voice = JsonSerializer.Deserialize<VoiceSettings>(configText, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+            if (voice != null)
+            {
+                return voice;
+            }
+            else
+            {
+                throw new NullReferenceException($"Could not parse voice profile for \"{voiceName}\".");
+            }
+        }
+
+        public static void Initialize()
+        {
+            log.Info($"Registered {Voices.Count} voices");
+            log.Info($"Narrator initialized to {Narrator.voice.voice_name}");
+            log.Info($"Clippy initialized to {Clippy.voice.voice_name}");
         }
 
         private void RunTtsStreamTask(string tts)
@@ -91,7 +131,7 @@ namespace CursedMoose.MASR.ElevenLabs
 
         private string BuildStreamArgs(string inputString)
         {
-            var cleanedInput = inputString;
+            var cleanedInput = MultipleWhitespaceRegex.Replace(inputString, " ").Trim();
             if (Config.remove_start_pattern)
             {
                 cleanedInput = Regex.Replace(inputString, Config.start_pattern, "");

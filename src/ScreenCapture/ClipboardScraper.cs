@@ -7,7 +7,6 @@ namespace CursedMoose.MASR.ScreenCapture
         readonly Logger log = new("ClipboardScraper");
         private Image previousImage;
         private bool Scraper_Running = false;
-        private string ImagePath = "images/clipboard.png";
 
         internal ClipboardScraper(Image defaultImage)
         {
@@ -109,22 +108,6 @@ namespace CursedMoose.MASR.ScreenCapture
             log.Info($"Goodbye at {DateTime.Now}");
             Scraper_Running = false;
             return;
-        }
-
-        private List<bool> GetHash(Image bmpSource)
-        {
-            List<bool> lResult = new List<bool>();
-            //create new image with 16x16 pixel
-            Bitmap bmpMin = new Bitmap(bmpSource, new Size(16, 16));
-            for (int j = 0; j < bmpMin.Height; j++)
-            {
-                for (int i = 0; i < bmpMin.Width; i++)
-                {
-                    //reduce colors to true / false                
-                    lResult.Add(bmpMin.GetPixel(i, j).GetBrightness() < 0.5f);
-                }
-            }
-            return lResult;
         }
     }
 }

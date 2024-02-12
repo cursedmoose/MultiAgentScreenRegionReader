@@ -1,12 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using CursedMoose.MASR.Commands;
+using CursedMoose.MASR.ElevenLabs;
 using CursedMoose.MASR.Hotkeys;
 using CursedMoose.MASR.Logging;
 using MultiAgentScreenRegionReader.Commands;
 
 Logger log = new Logger("Server");
-
 HotKeyManager.Initialize();
+ElevenLabs.Initialize();
 
 List<ServerCommand> handlers = new()
 {

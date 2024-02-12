@@ -1,0 +1,8 @@
+{
+  "voice_name": "Rachel",
+  "voice_id": "21m00Tcm4TlvDq8ikWAM",
+  "model": "eleven_turbo_v2",
+  "stability": 0.5,
+  "similarity": 0.75,
+  "style": 0
+}

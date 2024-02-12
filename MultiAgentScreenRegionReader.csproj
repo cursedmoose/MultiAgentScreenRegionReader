@@ -22,6 +22,12 @@
     <None Update="config\elevenlabs.config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="config\voices\adam.voice.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="config\voices\rachel.voice.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="lib\labs.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
